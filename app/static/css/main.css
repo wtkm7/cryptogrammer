@@ -1,0 +1,45 @@
+body{
+	background-color: #fbfbfb;
+}
+
+#main-jumbotron{
+	padding-top: 25px;
+	padding-bottom: 25px;
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+searchphrase{
+	font-style: italic;
+	text-transform: capitalize;
+}
+
+#cryptogram{
+	font-size: 20px;
+	font-family: monospace;
+}
+
+#solution-text-panel{
+	display: none;
+	font-size: 15px;
+	font-family: monospace;
+}
+
+#show-solution-button{
+	display: none;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.cryptogram-answer{
+	text-transform: uppercase;
+	font-family: monospace;
+	border-top: 0px;
+	border-right: 0px;
+	border-bottom: thin solid #000;
+	border-left: 0px;
+	background-color: #fbfbfb;
+}
+
+.cryptogram-char{
+	width: 35px;
+}
