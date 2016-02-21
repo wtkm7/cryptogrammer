@@ -1,30 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script id="cryptochar-template" type="text/html">
+	<div class="col-xs-1 cryptogram-char">
+		<div class="row">
+			<div class="col-xs-1">
+				<% if (cryptochar.ciphertext !== ' ' ) { %>
+					<input type="text" maxlength=1 size=1 class="cryptogram-answer cryptogram-answer-<%= cryptochar.ciphertext %>" char="<%= cryptochar.ciphertext %>" value="<%= cryptochar.usertext %>"/>
+				<% } %>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-1"><%= cryptochar.ciphertext %></div>
+		</div>
+	</div>
+</script>
+
 <div id="alerts"></div>
 
 <div id="main-jumbotron" class="jumbotron">
 	<p>Search a topic to generate a cryptogram.</p>
 	<div class="form-group">
 		<label for="searchphrase">Enter a Topic:</label>
-		<input id="searchphrase-box" type="text" name="searchphrase" placeholder="topic (ex. New York City)"/>
+		<input id="searchphrase-box" type="text" name="searchphrase" placeholder="topic (ex. Philadelphia)"/>
 	</div>
 	<button id="build-button" type="submit" class="btn btn-primary">Build Cryptogram!</button>
+	<button id="show-plaintext-button" type="button" class="btn btn-warning">
+		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Show the plaintext
+	</button>
 </div>
 
 <div id="searchphrase-header"></div>
 
-<section>
-	<div id="cryptogram" class="row"></div>
-</section>
-
-<section id="solution">
-	<button id="show-solution-button" type="button" class="btn btn-warning">
-		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Show the solution
-	</button>
-	
-	<div id="solution-text-panel"></div>
-</section>
+<div id="cryptogram" class="row"></div>
 
 {% endblock %}
 

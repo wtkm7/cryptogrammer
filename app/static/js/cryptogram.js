@@ -1,97 +1,137 @@
+(function(){
 
-/*
- * Draws the cryptogram on the page.
- */
-function drawcryptogram(cryptogram){
-	$('#cryptogram').empty();
-	$.map(cryptogram.split(''), function(char){
-		
-		if(char != ' '){
-			var inner = '<input type="text" maxlength=1 size=1 class="cryptogram-answer cryptogram-answer-'+char+'" char="'+char+'"/>';
-		}else{
-			var inner = '';
-		}
-		
-		var chartext = '<div class="col-xs-1 cryptogram-char">'
-					  +'	<div class="row">'
-					  +'		<div class="col-xs-1">'+inner+'</div>'
-					  +'	</div>'
-					  +'	<div class="row">'
-					  +'		<div class="col-xs-1">'+char+'</div>'					  
-					  +'	</div>'
-					  +'</div>';
-		
-		$('#cryptogram').append(chartext);
-	});
-}
-
-
-
-/*
- * Adds the solution section to the page.
- */
-function addsolution(solution){
-	
-	$('#solution-text-panel').css('display','none');
-	
-	$('#show-solution-button').css('display','block');
-	$('#solution-text-panel').empty().append(solution);
-
-	/*
-	 * When the show-solution button is clicked, display the
-	 * solution to the cryptogram.
-	 */
-	$('#show-solution-button').click(function(){
-		$('#solution-text-panel').css('display','block');
-	});
-}
-
-/*
- * When the build-button is clicked, request a cryptogram from the backend and
- * present it to the user.
- */
-$('#build-button').click(function(){
-	
-	// clear the alert section
-	$('#alerts').empty();
-	
-	// Read the search phrase from the textbox.
-	var searchphrase = $('#searchphrase-box').val();
-	
-	$.ajax({
-		url: 'cryptogram/'+searchphrase,
-		success: function(data, textStatus, jqXHR){
-
-			console.log(data);
-			
-			// Add header about the search phrase.
-			$('#searchphrase-header').empty();
-			$('#searchphrase-header').append('<h3>Cryptogram about <searchphrase>'+searchphrase+'</searchphrase></h3>')
-			
-			drawcryptogram(data['cryptogram']);
-			
-			//Clear auto-complete values of text fields.
-			$('.cryptogram-answer').val('');
-			
-			/*
-			 * When a blank is filled, update other corresponding blanks.
-			 */
-			$('.cryptogram-answer').keyup(function() {
-				var current_crypto = $(this).attr('char');
-				var current_answer = $(this).val().toUpperCase();
-				$('.cryptogram-answer-'+current_crypto).val( current_answer );
-			});
-			
-			addsolution(data['solution']);
-			
-		},
-		error: function(jqXHR, textStatus, errorThrown){
-				var responseJSON = $.parseJSON(jqXHR.responseText);
-				
-				$('#alerts').append('<div class="alert alert-danger" role="alert">'+responseJSON['message']+'</div>');
-				
-				console.log(responseJSON['message']);
-		}
-		});
-
+// CryptoChar stores information about a single character in the cryptogram.
+var CryptoChar = Backbone.Model.extend({
+	defaults: {
+		ciphertext: '',
+		usertext: '',
+		plaintext: ''
+	},
 });
+
+// CryptoCharCollection stores a set of CryptoChar models.
+var CryptoCharCollection = Backbone.Collection.extend({});
+
+// CryptoCharView contains logic for displaying CryptoChars.
+var CryptoCharView = Backbone.View.extend({
+	
+	initialize: function(){
+		
+		// Render on model change.
+		this.model.on('change', function(){
+			this.render();
+		}, this);
+	},
+	
+	template: _.template($('#cryptochar-template').html()),
+	
+	events: {
+		
+		// When the user updates their guess for a character, update all models
+		// related to that character.
+		'keyup input.cryptogram-answer' : 'updateCryptoCharModels',
+	},
+	
+	updateCryptoCharModels: function(e){
+		
+		// Get the current guess for the character that was changed.
+		var usertext = $(e.currentTarget).val();
+		
+		// Update each character that shares the same ciphertext as the one
+		// that was changed.
+		this.cryptocharlookup[this.model.get('ciphertext')].forEach(function(e){
+			e.set('usertext', usertext);
+		})
+	},
+	
+	render: function(){
+		var output =  this.template({cryptochar:this.model.toJSON()});
+		this.$el.html(output);
+		return this;
+	}
+});
+
+// When the build-button is clicked, request a cryptogram from the backend and
+// present it to the user.
+$('#build-button').click(function(){
+
+		// Clear the alert section.
+		$('#alerts').empty();
+		
+		// Read the search phrase from the textbox.
+		var searchphrase = $('#searchphrase-box').val();
+
+		$.ajax({
+			url: 'cryptogram/'+searchphrase,
+			success: function(data, textStatus, jqXHR){
+				
+				// Add header about the search phrase.
+				$('#searchphrase-header').empty();
+				$('#searchphrase-header').append('<h3>Cryptogram about <searchphrase>' + searchphrase + '</searchphrase></h3>')
+				
+				// Clear the cryptogram section.
+				$('#cryptogram').empty();
+				
+				var cryptocharlookup = {};
+				
+				// Generate CryptoChar models and populate cryptocharlookup.
+				var cryptochars = _.zip(data['cryptogram'], data['solution']).map(function(d){
+					
+					var cryptochar = new CryptoChar({ciphertext: d[0], usertext: '', plaintext: d[1] })
+					
+					// Add this model to cryptocharlookup.
+					if(!cryptocharlookup.hasOwnProperty(d[0])){
+						cryptocharlookup[d[0]] = [cryptochar];
+					}else{
+						cryptocharlookup[d[0]].push(cryptochar);
+					}
+					
+					return cryptochar;
+				});
+				
+				var cryptogram = new CryptoCharCollection(cryptochars);
+				
+				// Create a new view for every character model in the
+				// cryptogram.
+				var cryptocharviews = cryptogram.map(function(cryptochar){
+					var cryptocharview = new CryptoCharView({model: cryptochar});
+					cryptocharview.cryptocharlookup = cryptocharlookup;
+					return cryptocharview;
+				});
+
+				// For each view, add a new element to the cryptogram, attach
+				// the view to that element and render each character view.
+				cryptocharviews.forEach(function(cryptocharview){
+					$('#cryptogram').append('<div id="'+cryptocharview.cid+'"></div>');
+					cryptocharview.setElement('#'+cryptocharview.cid);
+					cryptocharview.render();
+				});
+
+				// When show-plaintext-button is clicked, fill in the correct
+				// plaintext for each character.
+				$('#show-plaintext-button').click(function(){
+					cryptogram.forEach(function(cryptochar){
+							var plaintext = cryptochar.get('plaintext');
+							cryptochar.set('usertext', plaintext);
+					});
+				});
+				
+				// Show the show-plaintext-button.
+				$('#show-plaintext-button').css('display', 'inline');
+				
+				//Clear auto-complete values of text fields.
+				$('.cryptogram-answer').val('');
+				
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+					var responseJSON = $.parseJSON(jqXHR.responseText);
+					
+					// Add an alert with the error message returned by the
+					// server.
+					$('#alerts').append('<div class="alert alert-danger" role="alert">'+responseJSON['message']+'</div>');
+			}
+		});
+});
+
+})();
+
