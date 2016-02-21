@@ -1,20 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script id="cryptochar-template" type="text/html">
-	<div class="col-xs-1 cryptogram-char">
-		<div class="row">
-			<div class="col-xs-1">
-				<% if (cryptochar.ciphertext !== ' ' ) { %>
-					<input type="text" maxlength=1 size=1 class="cryptogram-answer cryptogram-answer-<%= cryptochar.ciphertext %>" char="<%= cryptochar.ciphertext %>" value="<%= cryptochar.usertext %>"/>
-				<% } %>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-xs-1"><%= cryptochar.ciphertext %></div>
-		</div>
-	</div>
-</script>
+
+{% include 'underscore.html' %}
 
 <div id="alerts"></div>
 
