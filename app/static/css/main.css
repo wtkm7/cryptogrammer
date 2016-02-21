@@ -42,3 +42,19 @@ searchphrase{
 .cryptogram-char{
 	width: 35px;
 }
+
+.correct{
+	color: #007400;
+}
+
+.correct .cryptogram-answer{
+	border-bottom: thin solid #007400;
+}
+
+.incorrect{
+	color: #740000;
+}
+
+.incorrect .cryptogram-answer{
+	border-bottom: thin solid #740000;
+}

@@ -1,5 +1,5 @@
 <script id="cryptochar-template" type="text/html">
-	<div class="col-xs-1 cryptogram-char">
+	<div class="col-xs-1 cryptogram-char <%= cryptochar.usertext !== '' ? (cryptochar.correct ? 'correct' : 'incorrect') : '' %>">
 		<div class="row">
 			<div class="col-xs-1">
 				<% if (cryptochar.ciphertext !== ' ' ) { %>

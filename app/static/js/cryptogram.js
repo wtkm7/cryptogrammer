@@ -5,8 +5,9 @@ var CryptoChar = Backbone.Model.extend({
 	defaults: {
 		ciphertext: '',
 		usertext: '',
-		plaintext: ''
-	},
+		plaintext: '',
+		correct: false
+	}
 });
 
 // CryptoCharCollection stores a set of CryptoChar models.
@@ -17,9 +18,19 @@ var CryptoCharView = Backbone.View.extend({
 	
 	initialize: function(){
 		
-		// Render on model change.
-		this.model.on('change', function(){
+		// Check for correctness and render the view on model change.
+		this.model.on('change', function(){	
+			
+			// If the usertext for this character is correct, mark it as
+			// correct
+			if(this.model.get('usertext') === this.model.get('plaintext')){
+				this.model.set('correct', true);
+			}else{
+				this.model.set('correct', false);
+			}
+			
 			this.render();
+			
 		}, this);
 	},
 	
@@ -35,13 +46,13 @@ var CryptoCharView = Backbone.View.extend({
 	updateCryptoCharModels: function(e){
 		
 		// Get the current guess for the character that was changed.
-		var usertext = $(e.currentTarget).val();
+		var usertext = $(e.currentTarget).val().toUpperCase();
 		
 		// Update each character that shares the same ciphertext as the one
 		// that was changed.
 		this.cryptocharlookup[this.model.get('ciphertext')].forEach(function(e){
 			e.set('usertext', usertext);
-		})
+		});
 	},
 	
 	render: function(){
