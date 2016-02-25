@@ -14,7 +14,7 @@ searchphrase{
 	text-transform: capitalize;
 }
 
-#cryptogram{
+#cryptogram-canvas{
 	font-size: 20px;
 	font-family: monospace;
 }
@@ -36,7 +36,7 @@ searchphrase{
 	border-right: 0px;
 	border-bottom: thin solid #000;
 	border-left: 0px;
-	background-color: #fbfbfb;
+	background-color: #fff;
 }
 
 .cryptogram-char{
@@ -57,4 +57,8 @@ searchphrase{
 
 .incorrect .cryptogram-answer{
 	border-bottom: thin solid #740000;
+}
+
+#cryptogram{
+	display: none;
 }

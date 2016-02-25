@@ -78,8 +78,11 @@ function buildCryptogram(){
 			$('#searchphrase-header').empty();
 			$('#searchphrase-header').append('<h3>Cryptogram about <searchphrase>' + searchphrase + '</searchphrase></h3>')
 			
-			// Clear the cryptogram section.
-			$('#cryptogram').empty();
+			// Show the cryptogram panel
+			$('#cryptogram').css('display','inline');
+			
+			// Clear the canvas section.
+			$('#cryptogram-canvas').empty();
 			
 			var cryptocharlookup = {};
 			
@@ -111,7 +114,7 @@ function buildCryptogram(){
 			// For each view, add a new element to the cryptogram, attach
 			// the view to that element and render each character view.
 			cryptocharviews.forEach(function(cryptocharview){
-				$('#cryptogram').append('<div id="'+cryptocharview.cid+'"></div>');
+				$('#cryptogram-canvas').append('<div id="'+cryptocharview.cid+'"></div>');
 				cryptocharview.setElement('#'+cryptocharview.cid);
 				cryptocharview.render();
 			});
@@ -137,7 +140,7 @@ function buildCryptogram(){
 				
 				// Add an alert with the error message returned by the
 				// server.
-				$('#alerts').append('<div class="alert alert-danger" role="alert">'+responseJSON['message']+'</div>');
+				$('#alerts').append('<div class="alert alert-danger" role="alert"><strong>Error!</strong> '+responseJSON['message']+'</div>');
 		}
 		
 	});

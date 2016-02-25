@@ -6,21 +6,30 @@
 
 <div id="alerts"></div>
 
-<div id="main-jumbotron" class="jumbotron">
-	<p>Search a topic to generate a cryptogram.</p>
-	<div class="form-group">
-		<label for="searchphrase">Enter a Topic:</label>
-		<input id="searchphrase-box" type="text" name="searchphrase" placeholder="topic (ex. Philadelphia)"/>
+<div class="panel panel-default">
+	<div class="panel-body">
+		<h4>Search a topic to generate a cryptogram.</h4>
+		<div class="form-group">
+			<label for="searchphrase">Enter a Topic:</label>
+			<input id="searchphrase-box" type="text" name="searchphrase" placeholder="topic (ex. Philadelphia)"/>
+			<button id="build-button" type="submit" class="btn btn-primary">
+				<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Build cryptogram
+			</button>
+			<button id="show-plaintext-button" type="button" class="btn btn-warning">
+				<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Show plaintext
+			</button>
+		</div>
 	</div>
-	<button id="build-button" type="submit" class="btn btn-primary">Build Cryptogram!</button>
-	<button id="show-plaintext-button" type="button" class="btn btn-warning">
-		<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Show the plaintext
-	</button>
 </div>
 
-<div id="searchphrase-header"></div>
-
-<div id="cryptogram" class="row"></div>
+<div id="cryptogram">
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div id="searchphrase-header"></div>
+			<div id="cryptogram-canvas" class="row"></div>
+		</div>
+	</div>
+</div>
 
 {% endblock %}
 
