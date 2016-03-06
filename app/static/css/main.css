@@ -2,13 +2,6 @@ body{
 	background-color: #fbfbfb;
 }
 
-#main-jumbotron{
-	padding-top: 25px;
-	padding-bottom: 25px;
-	padding-left: 25px;
-	padding-right: 25px;
-}
-
 searchphrase{
 	font-style: italic;
 	text-transform: capitalize;
@@ -57,6 +50,11 @@ searchphrase{
 
 .incorrect .cryptogram-answer{
 	border-bottom: thin solid #740000;
+}
+
+.highlighted{
+	font-style: italic;
+	font-weight: 900;
 }
 
 #cryptogram{

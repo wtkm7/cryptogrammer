@@ -6,7 +6,8 @@ var CryptoChar = Backbone.Model.extend({
 		ciphertext: '',
 		usertext: '',
 		plaintext: '',
-		correct: false
+		correct: false,
+		highlighted: false
 	}
 });
 
@@ -41,6 +42,15 @@ var CryptoCharView = Backbone.View.extend({
 		// When the user updates their guess for a character, update all models
 		// related to that character.
 		'keyup input.cryptogram-answer' : 'updateCryptoCharModels',
+		
+		// When the user's mouse cursor is over a character view, alter the
+		// style to highlight the character.
+		'mouseover': 'highlightChars',
+		
+		// When the user's mouse cursor leaves a character view, revert the
+		// style.
+		'mouseout': 'unhighlightChars'
+		
 	},
 	
 	updateCryptoCharModels: function(e){
@@ -53,6 +63,38 @@ var CryptoCharView = Backbone.View.extend({
 		this.cryptocharlookup[this.model.get('ciphertext')].forEach(function(e){
 			e.set('usertext', usertext);
 		});
+	},
+	
+	highlightChars: function(){
+		
+		if(!this.model.get('highlighted')){			
+			
+			this.model.set('highlighted', true);
+			
+			// Clear the highlighting for all characters.			
+			this.cryptocharlist.forEach(function(e){
+				e.set('highlighted', false);
+			});
+			
+			// Highlight each character that shares the same ciphertext as the
+			// one that was changed.
+			this.cryptocharlookup[this.model.get('ciphertext')].forEach(function(e){
+				e.set('highlighted', true);
+			});	
+
+		}
+	},
+
+	unhighlightChars: function(){
+		
+		this.model.set('highlighted', false);
+		
+		// Clear the highlighting for each character that shares the same
+		// ciphertext as the one that was changed.
+		this.cryptocharlookup[this.model.get('ciphertext')].forEach(function(e){
+			e.set('highlighted', false);
+		});
+			
 	},
 	
 	render: function(){
@@ -85,6 +127,7 @@ function buildCryptogram(){
 			$('#cryptogram-canvas').empty();
 			
 			var cryptocharlookup = {};
+			var cryptocharlist = [];
 			
 			// Generate CryptoChar models and populate cryptocharlookup.
 			var cryptochars = _.zip(data['cryptogram'], data['solution']).map(function(d){
@@ -98,6 +141,8 @@ function buildCryptogram(){
 					cryptocharlookup[d[0]].push(cryptochar);
 				}
 				
+				cryptocharlist.push(cryptochar);
+				
 				return cryptochar;
 			});
 			
@@ -108,6 +153,8 @@ function buildCryptogram(){
 			var cryptocharviews = cryptogram.map(function(cryptochar){
 				var cryptocharview = new CryptoCharView({model: cryptochar});
 				cryptocharview.cryptocharlookup = cryptocharlookup;
+				cryptocharview.cryptocharlist = cryptocharlist;
+				
 				return cryptocharview;
 			});
 
